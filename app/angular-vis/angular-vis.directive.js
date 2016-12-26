@@ -45,11 +45,43 @@ angular.module('diatestApp')
         }
       }
     };
+    var _events = [
+        'click',
+        'doubleClick',
+        'oncontext',
+        'hold',
+        'release',
+        'selectNode',
+        'selectEdge',
+        'deselectNode',
+        'deselectEdge',
+        'dragStart',
+        'dragging',
+        'dragEnd',
+        'hoverNode',
+        'hoverEdge',
+        'blurNode',
+        'blurEdge',
+        'zoom',
+        'showPopup',
+        'hidePopup',
+        'startStabilizing',
+        'stabilizationProgress',
+        'stabilizationIterationsDone',
+        'stabilized',
+        'resize',
+        'initRedraw',
+        'beforeDrawing',
+        'afterDrawing',
+        'animationFinished'
+      ];
+
 
     var VisOptions = function(info) {
       this.edges = [];
       this.nodes = [];
       this.style = {};
+      this.events = [];
       this.diagram = {
         autoResize: true,
         height: '100%',
@@ -256,11 +288,16 @@ angular.module('diatestApp')
       redraw: function() {},
       focus: function(nodeId, fo) {},
       moveTo: function(mto) {},
-      onClick: function() {},
-      onSelectNode: function() {},
-      onDeselectNode: function() {},
-      onSelectEdge: function() {},
-      onDeselectEdge: function() {}
+      onload: function() {},
+      watch: function(e, callback) {
+        this.events.push({event:e, callback:callback});
+      }
+
+      // onClick: function() {},
+      // onSelectNode: function() {},
+      // onDeselectNode: function() {},
+      // onSelectEdge: function() {},
+      // onDeselectEdge: function() {}
     };
 
     // var fto = {
@@ -457,6 +494,7 @@ angular.module('diatestApp')
     VisEdge.prototype = {};
 
     return {
+      events: _events,
       options: function(info) { return new VisOptions(info); },
       node: function(info) { return new VisNode(info); },
       edge: function(info) { return new VisEdge(info); }
@@ -466,7 +504,7 @@ angular.module('diatestApp')
     function (util,visHelper) {
       return {
         restrict: 'E',
-        template: '<div></div>',
+        template: '<div class="vis-container"></div>',
         replace: true,
         scope: {options: '='},
         link: function (scope, ele, atr) {
@@ -474,42 +512,44 @@ angular.module('diatestApp')
           _.defaults(scope.options, _defaults);
           var _container =  ele[0];
           var _self = scope;
-          var _refresh = new util.TimeoutHandler();
+          var _timeout = new util.TimeoutHandler();
 
-          function _execAction(name, params) {
-            if (_self.options[name] && _.isFunction(_self.options[name])) {
-              _self.options[name](params);
-              console.log(name+' event:', params);
-            }
-          }
-
-          function refresh() {
+          function _refresh() {
             var css = _self.options.style || {};
             $(_container).css(css);
             var data = {
               nodes: _self.options.nodes,
-              edges: _self.options.edges
+              edges: _self.options.edges,
+              isEmpty: function() {
+
+              }
             };
+
+            if (_self.network != null) _self.network.destroy();
+
+            if (data.isEmpty()) {
+              console.warn('[visjs - network] no data!');
+              return;
+            }
+
             _self.network = new vis.Network(_container, data, _self.options.diagram);
-            _self.network.on("click", function (params) {
-              _execAction('onClick', params);
-            });
-            _self.network.on("selectNode", function (params) {
-              _execAction('onSelectNode', params);
-            });
-            _self.network.on("deselectNode", function (params) {
-              _execAction('onDeselectNode', params);
-            });
-            _self.network.on("selectEdge", function (params) {
-              _execAction('onSelectEdge', params);
-            });
-            _self.network.on("deselectNode", function (params) {
-              _execAction('onDeselectEdge', params);
-            });
+
+            if (_self.options.events && _.isArray(_self.options.events)) {
+              _self.options.events.forEach(function (e, callback) {
+                _.find(visHelper.events, function (ev) {
+                  if (e.event == ev)
+                    _self.network.on(ev, e.callback);
+                });
+              });
+            }
+
+            if (_self.options.onload && _.isFunction(_self.options.onload)) {
+              _self.options.onload(_self.network);
+            }
           }
 
           scope.$watch('options', function() {
-            _refresh.exec(refresh);
+            _timeout.exec(_refresh);
           }, true);
         }
       }

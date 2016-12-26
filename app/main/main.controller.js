@@ -12,6 +12,16 @@ angular.module('diatestApp')
     function ($scope, $timeout, visHelper) {
       $scope.current = {};
       $scope.currentStr = '';
+
+      $scope.data = [
+        {id:1, rifid:undefined, desc:'elem1', type:'tipo1'},
+        {id:2, rifid:1, desc:'elem2', type:'tipo1'},
+        {id:3, rifid:1, desc:'elem3', type:'tipo2'}];
+
+
+
+
+
       $scope.diagrammOptions = visHelper.options({
         style:{
           position: 'absolute',
@@ -61,6 +71,11 @@ angular.module('diatestApp')
       $scope.diagrammOptions.watch('click', function(a){
         $timeout(function(){
           $scope.selection = JSON.stringify(a, null, 2);
+          if (a.nodes.length) {
+            $scope.diagrammOptions.setnode(a.nodes[0], function(n){
+              n.color = 'red';
+            });
+          }
         });
       });
 

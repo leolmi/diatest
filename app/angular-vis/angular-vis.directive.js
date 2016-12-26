@@ -291,13 +291,13 @@ angular.module('diatestApp')
       onload: function() {},
       watch: function(e, callback) {
         this.events.push({event:e, callback:callback});
+      },
+      setnode: function(id, cb) {
+        var n = _.find(this.nodes, function (xn) {
+          return xn.id == id;
+        });
+        if (n) cb(n);
       }
-
-      // onClick: function() {},
-      // onSelectNode: function() {},
-      // onDeselectNode: function() {},
-      // onSelectEdge: function() {},
-      // onDeselectEdge: function() {}
     };
 
     // var fto = {
@@ -513,6 +513,8 @@ angular.module('diatestApp')
           var _container =  ele[0];
           var _self = scope;
           var _timeout = new util.TimeoutHandler();
+          var _seed;
+
 
           function _refresh() {
             var css = _self.options.style || {};
@@ -525,7 +527,9 @@ angular.module('diatestApp')
               }
             };
 
-            if (_self.network != null) _self.network.destroy();
+            if (_self.network != null) {
+              _self.network.destroy();
+            }
 
             if (data.isEmpty()) {
               console.warn('[visjs - network] no data!');
@@ -535,7 +539,7 @@ angular.module('diatestApp')
             _self.network = new vis.Network(_container, data, _self.options.diagram);
 
             if (_self.options.events && _.isArray(_self.options.events)) {
-              _self.options.events.forEach(function (e, callback) {
+              _self.options.events.forEach(function (e) {
                 _.find(visHelper.events, function (ev) {
                   if (e.event == ev)
                     _self.network.on(ev, e.callback);
@@ -543,14 +547,27 @@ angular.module('diatestApp')
               });
             }
 
+
             if (_self.options.onload && _.isFunction(_self.options.onload)) {
               _self.options.onload(_self.network);
             }
           }
 
-          scope.$watch('options', function() {
-            _timeout.exec(_refresh);
+          scope.$watch('options', function(n) {
+            // if (_self.network)
+            //   _seed = _self.network.getSeed();
+             _timeout.exec(_refresh);
+
+            // if (_self.network) {
+            //   var data = {
+            //     nodes: _self.options.nodes,
+            //     edges: _self.options.edges
+            //   };
+            //   _self.network.setData(data);
+            // }
           }, true);
+
+          _timeout.exec(_refresh);
         }
       }
     }]);

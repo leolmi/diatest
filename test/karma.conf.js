@@ -35,6 +35,7 @@ module.exports = function(config) {
       'bower_components/vis/dist/vis.js',
       'bower_components/jquery-ui/jquery-ui.js',
       'bower_components/underscore/underscore.js',
+      'bower_components/file-saver/FileSaver.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       "app/scripts/**/*.js",

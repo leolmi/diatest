@@ -51,16 +51,20 @@
     <script src="bower_components/vis/dist/vis.js"></script>
     <script src="bower_components/jquery-ui/jquery-ui.js"></script>
     <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/file-saver/FileSaver.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
-      <!-- build:js({.tmp,app}) scripts/scripts.js -->
-      <script src="app.js"></script>
-      <script src="util.js"></script>
-      <script src="main/main.controller.js"></script>
-      <script src="about/about.controller.js"></script>
-      <script src="angular-vis/angular-vis.directive.js"></script>
-      <!-- endbuild -->
+    <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="app.js"></script>
+    <script src="util.js"></script>
+    <script src="data/data-parser.js"></script>
+    <script src="main/main.controller.js"></script>
+    <script src="main/builder.js"></script>
+
+    <script src="about/about.controller.js"></script>
+    <script src="angular-vis/angular-vis.directive.js"></script>
+    <!-- endbuild -->
 
 </body>
 </html>

@@ -58,8 +58,42 @@ angular.module("diatestApp")
         };
       }
 
+      function toString(v, trim) {
+        if (_.isNaN(v) || _.isUndefined(v) || _.isNull(v)) return '';
+        if (_.isString(v)) return v;
+        if (v && _.isFunction(v.toString))
+          return v.toString();
+        return trim ? (''+v).trim() : ''+v;
+      }
+
+      /**
+       * Effettua la replace dei valori forniti tramite elenco o oggetto nella stringa
+       * @param {string} str
+       * @param {[]|object} args
+       * @param {object} [obj]
+       */
+      function formatString(str, args, o) {
+        if (args && _.isArray(args)) {
+          args.forEach(function (v, i) {
+            var rgx = new RegExp('\\{' + i + '\\}', 'g');
+            str = str.replace(rgx, toString(v));
+          });
+        }
+        else if (args && _.isObject(args)) {
+          o = args;
+        }
+        if (o && _.isObject(o)) {
+          for(var pn in o) {
+            var rgx = new RegExp('\\{'+pn+'\\}', 'g');
+            str = str.replace(rgx, toString(o[pn]));
+          }
+        }
+        return str;
+      }
+
       return {
         TimeoutHandler: TimeoutHandler,
-        guid:guid
+        guid:guid,
+        formatString: formatString
       }
     }]);

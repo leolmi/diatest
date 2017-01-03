@@ -3,78 +3,6 @@
 angular.module('diatestApp')
   .factory('visHelper', ['util',
     function(util) {
-      var __orange = {
-        background: "#ed7d31",
-        border: "#ad592a",
-        highlight: {
-          background: "#ed7d31",
-          border: "#ad592a"
-        }
-      };
-      var __green = {
-        background: "#548235",
-        border: "#3b602b",
-        highlight: {
-          background: "#548235",
-          border: "#3b602b"
-        }
-      };
-      var __grey = {
-        background: "#999",
-        border: "#666",
-        highlight: {
-          background: "#999",
-          border: "#666"
-        }
-      };
-      var __blue = {
-        background: "#5b9bd5",
-        border: "#4d739f",
-        highlight: {
-          background: "#5b9bd5",
-          border: "#4d739f"
-        }
-      };
-
-
-      var _eli_groups = {
-        // verde
-        ordine_eseguito: {
-          color: __green,
-          shape: 'circle'
-        },
-        //arancione
-        ordine_revocato: {
-          color: __orange,
-          shape: 'circle'
-        },
-        //celeste
-        modifica: {
-          color: __blue,
-          shape: 'circle'
-        },
-        revoca: {
-
-        },
-        conf_mkt: {
-          color: __grey,
-          shape: 'box',
-          shapeProperties: {
-            borderRadius: 0
-          }
-        },
-        //verde
-        action_eseguito: {
-          color: __green,
-          shape: 'ellipse'
-        },
-        //arancione
-        action_ineseguito: {
-          color: __orange,
-          shape: 'ellipse'
-        }
-      };
-
       var _default = {
         blue: {
           color: {
@@ -117,12 +45,6 @@ angular.module('diatestApp')
           }
         }
       };
-
-      var _groups = {
-        eli: _eli_groups,
-        default: _default
-      };
-
       var _events = [
         'click',
         'doubleClick',
@@ -153,7 +75,6 @@ angular.module('diatestApp')
         'afterDrawing',
         'animationFinished'
       ];
-
 
       var VisOptions = function (info) {
         this.edges = [];
@@ -220,12 +141,12 @@ angular.module('diatestApp')
               }
             }
           },
-          groups: _groups.eli,       // defined in the groups module.
+          groups: _default,       // defined in the groups module.
           layout: {                     // defined in the layout module.
             randomSeed: 12,
             improvedLayout: true,
             hierarchical: {
-              enabled: true,
+              enabled: false,
               levelSeparation: 100,
               nodeSpacing: 100,
               treeSpacing: 100,
@@ -241,7 +162,7 @@ angular.module('diatestApp')
             dragView: true,
             hideEdgesOnDrag: false,
             hideNodesOnDrag: false,
-            hover: false,
+            hover: true,
             hoverConnectedEdges: true,
             keyboard: {
               enabled: false,
@@ -305,7 +226,7 @@ angular.module('diatestApp')
               enabled: true,
               iterations: 1000,
               updateInterval: 100,
-              onlyDynamicEdges: false,
+              onlyDynamicEdges: true,
               fit: true
             },
             timestep: 0.5,
@@ -531,7 +452,6 @@ angular.module('diatestApp')
       VisEdge.prototype = {};
 
       return {
-        styles: _groups,
         events: _events,
         options: function (info) {
           return new VisOptions(info);
@@ -557,7 +477,6 @@ angular.module('diatestApp')
           var _container =  ele[0];
           var _self = scope;
           var _timeout = new util.TimeoutHandler();
-          var _seed;
 
 
           function _refresh() {
@@ -597,21 +516,9 @@ angular.module('diatestApp')
             }
           }
 
-          scope.$watch('options', function(n) {
-            // if (_self.network)
-            //   _seed = _self.network.getSeed();
+          scope.$watch('options', function() {
              _timeout.exec(_refresh);
-
-            // if (_self.network) {
-            //   var data = {
-            //     nodes: _self.options.nodes,
-            //     edges: _self.options.edges
-            //   };
-            //   _self.network.setData(data);
-            // }
           }, true);
-
-          _timeout.exec(_refresh);
         }
       }
     }]);
